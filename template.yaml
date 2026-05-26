@@ -1,0 +1,31 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+Description: Multi-Region Security Pipeline
+
+Resources:
+  SecurityScanFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      FunctionName: GlobalSecurityScanner
+      Handler: lambda_function.lambda_handler
+      Runtime: python3.12
+      Timeout: 30
+      Environment:
+        Variables:
+          SNS_TOPIC_ARN: !Ref SecurityAlertTopic
+      Events:
+        S3Upload:
+          Type: S3
+          Properties:
+            Bucket: !Ref LandingBucket
+            Events: s3:ObjectCreated:*
+
+  LandingBucket:
+    Type: AWS::S3::Bucket
+    Properties:
+      BucketName: untrusted-landing-primary-pc-11
+
+  SecurityAlertTopic:
+    Type: AWS::SNS::Topic
+    Properties:
+      TopicName: GlobalSecurityAlertsTopic
