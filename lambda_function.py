@@ -26,16 +26,16 @@ def lambda_handler(event, context):
         if file_extension in FORBIDDEN_EXTENSIONS:
             print(f"🚨 SECURITY BREACH DETECTED: Malicious extension {file_extension} found!")
 
-           # 1. QUARANTINE THE THREAT
-try:
-    s3_client.copy_object(
-        Bucket=QUARANTINE_ZONE,
-        CopySource={'Bucket': source_bucket, 'Key': file_key},
-        Key=file_key
-    )
-    print(f"Isolated file in primary quarantine zone: {QUARANTINE_ZONE}")
-except Exception as e:
-    print(f"⚠️ Quarantine failed: {str(e)} - Continuing with purge and alert.")
+            # 1. QUARANTINE THE THREAT
+            try:
+                s3_client.copy_object(
+                    Bucket=QUARANTINE_ZONE,
+                    CopySource={'Bucket': source_bucket, 'Key': file_key},
+                    Key=file_key
+                )
+                print(f"Isolated file in primary quarantine zone: {QUARANTINE_ZONE}")
+            except Exception as e:
+                print(f"⚠️ Quarantine failed: {str(e)} - Continuing with purge and alert.")
 
             # 2. PURGE THE THREAT FROM BOTH GEOGRAPHICAL REGIONS
             # Remove from N. Virginia Primary landing bucket
